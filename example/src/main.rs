@@ -3,7 +3,7 @@ use deno::Isolate;
 use deno::StartupData;
 use deno_snapshot::snapshot;
 
-#[snapshot("example/src/bundle.js")]
+#[snapshot("src/bundle.js")]
 fn get_snapshot() {}
 
 fn main() {
@@ -12,7 +12,7 @@ fn main() {
 
   let mut isolate = Isolate::new(StartupData::Snapshot(x), false);
   js_check(isolate.execute(
-    "overflow_res_multiple_dispatch_async.js",
+    "<anon>",
     r#"
       if (add(1, 2) != 3) {
         throw Error("bad");
