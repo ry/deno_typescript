@@ -1,5 +1,6 @@
 [workspace]
 members = [
   "deno_snapshot",
+  "deno_ts",
   "example",
 ]

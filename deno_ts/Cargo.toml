@@ -1,0 +1,21 @@
+[package]
+name = "deno_ts"
+version = "0.1.0"
+authors = ["Ryan Dahl <ry@tinyclouds.org>"]
+edition = "2018"
+build = "build.rs"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+deno_snapshot = { path = "../deno_snapshot" }
+deno = "0.14.0"
+syn = { version="0.15.43", features=["full"] }
+quote = "0.6.13"
+proc-macro2 = "0.4"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+
+
+

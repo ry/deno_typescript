@@ -11,4 +11,5 @@ include = ["src/bundle.js"]
 
 [dependencies]
 deno_snapshot = { path = "../deno_snapshot" }
-deno = "0.12.0"
+deno_ts = { path = "../deno_ts" }
+deno = "0.14.0"

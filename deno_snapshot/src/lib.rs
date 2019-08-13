@@ -11,6 +11,8 @@ use proc_macro2::TokenTree;
 use quote::ToTokens;
 use quote::TokenStreamExt;
 use std::path::PathBuf;
+use syn::parse::{Parse, ParseStream};
+use syn::{parse_macro_input, Ident, Token};
 
 struct ByteString<'a>(&'a [u8]);
 
@@ -21,20 +23,29 @@ impl ToTokens for ByteString<'_> {
   }
 }
 
-use syn::parse::{Parse, ParseStream};
-use syn::{parse_macro_input, Ident, Token};
-
 struct SnapshotArgs {
   ident: Ident,
-  filename: syn::LitStr,
+  filenames: Vec<syn::LitStr>,
 }
 
 impl Parse for SnapshotArgs {
   fn parse(input: ParseStream) -> syn::Result<Self> {
     let ident = input.parse()?;
     input.parse::<Token![,]>()?;
-    let filename = input.parse()?;
-    Ok(SnapshotArgs { ident, filename })
+
+    let mut filenames = Vec::new();
+    loop {
+      let filename = input.parse()?;
+      filenames.push(filename);
+      let lookahead = input.lookahead1();
+      if lookahead.peek(Token![,]) {
+        input.parse::<Token![,]>()?;
+      } else {
+        break;
+      }
+    }
+    //let filename = input.parse()?;
+    Ok(SnapshotArgs { ident, filenames })
   }
 }
 
@@ -43,26 +54,28 @@ impl Parse for SnapshotArgs {
 // expressions.
 #[proc_macro]
 pub fn make_snapshot(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-  let snapshot_args = parse_macro_input!(item as SnapshotArgs);
+  let args = parse_macro_input!(item as SnapshotArgs);
 
-  let name = snapshot_args.ident;
-  let js_filename = snapshot_args.filename.value();
+  let name = args.ident;
 
   let cargo_manifest_dir = PathBuf::from(
     std::env::var_os("CARGO_MANIFEST_DIR")
       .expect("CARGO_MANIFEST_DIR env var not set"),
   );
-  let js_path = cargo_manifest_dir.join(&js_filename);
-  let js_source = std::fs::read(&js_path).expect("couldn't read js_filename");
-  let js_source_str = std::str::from_utf8(&js_source).unwrap();
 
   let will_snapshot = true;
   let mut isolate = Isolate::new(StartupData::None, will_snapshot);
 
-  println!("executing javascript {}", js_path.display());
-  js_check(isolate.execute(&js_filename, js_source_str));
+  for filename in args.filenames {
+    let js_filename = filename.value();
+    let js_path = cargo_manifest_dir.join(&js_filename);
+    let js_source = std::fs::read(&js_path).expect("couldn't read js_filename");
+    let js_source_str = std::str::from_utf8(&js_source).unwrap();
+    println!("executing javascript {}", js_path.display());
+    js_check(isolate.execute(&js_filename, js_source_str));
+  }
 
-  println!("creating snapshot {}", js_path.display());
+  println!("creating snapshot ");
   let snapshot = isolate.snapshot().expect("error snapshotting");
 
   let snapshot_slice =
@@ -73,7 +86,9 @@ pub fn make_snapshot(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
   let byte_string = ByteString(snapshot_slice);
 
   let tokens = quote::quote! {
-    static #name: &[u8] = #byte_string;
+      static #name: &[u8] = #byte_string;
+      // static foo__##name: &[u8] = include_bytes!(#js_filename_);
   };
+  // println!("tokens {}", tokens.to_string());
   tokens.into()
 }
