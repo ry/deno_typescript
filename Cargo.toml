@@ -2,5 +2,7 @@
 members = [
   "deno_snapshot",
   "deno_ts",
+  "deno_ts2",
   "example",
+  "example2",
 ]
