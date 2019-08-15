@@ -42,11 +42,7 @@ fn compile_typescript(
   Ok(())
 }
 
-pub fn make_ts_snapshot(
-  ts_out_dir: &Path,
-  snapshot_path: &Path,
-  root_names: Vec<PathBuf>,
-) -> Result<(), ErrBox> {
+pub fn tsc(ts_out_dir: &Path, root_names: Vec<PathBuf>) -> Result<(), ErrBox> {
   let mut ts_isolate = new_isolate();
 
   let config_json = serde_json::json!({
@@ -76,11 +72,16 @@ pub fn make_ts_snapshot(
     ));
   }
 
-  let out_dir = Path::new("/tmp/foo"); // TODO(ry) duplicated in main.js
+  Ok(())
+}
 
+pub fn mksnapshot(
+  ts_out_dir: &Path,
+  snapshot_path: &Path,
+) -> Result<(), ErrBox> {
   let mut runtime_isolate = Isolate::new(StartupData::None, true);
 
-  for entry in std::fs::read_dir(out_dir)? {
+  for entry in std::fs::read_dir(ts_out_dir)? {
     let entry = entry?;
     let path = entry.path();
     if let Some(ext) = path.extension() {
