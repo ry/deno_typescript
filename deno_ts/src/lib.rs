@@ -103,21 +103,3 @@ pub fn mksnapshot(
   std::fs::write(snapshot_path, snapshot_slice)?;
   Ok(())
 }
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-  #[test]
-  fn test_compile_typescript() {
-    let mut isolate = new_isolate();
-    js_check(compile_typescript(&mut isolate, "src/bundle.ts"));
-  }
-
-  /*
-  #[test]
-  fn test_make_snapshot() {
-    let mut isolate = new_isolate();
-    js_check(compile_typescript(&mut isolate, "src/bundle.ts"));
-  }
-  */
-}
