@@ -1,8 +1,10 @@
 [package]
 name = "deno_typescript"
-publish = false
 version = "0.0.1"
+license = "MIT"
+description = "To compile TypeScript to a snapshot during build.rs"
 repository = "https://github.com/ry/deno_typescript"
+readme = "../README.md"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
 build = "build.rs"
