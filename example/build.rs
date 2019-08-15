@@ -10,7 +10,7 @@ fn main() {
   let cargo_manifest_dir =
     PathBuf::from(std::env::var_os("CARGO_MANIFEST_DIR").unwrap());
 
-  let roots = vec![cargo_manifest_dir.join("src/bundle.ts")];
+  let roots = vec![cargo_manifest_dir.join("foo.ts")];
   deno_typescript::tsc(&ts_out_dir, roots).unwrap();
   deno_typescript::mksnapshot(&ts_out_dir, &snapshot_path).unwrap();
   println!(

@@ -9,6 +9,9 @@ authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
 build = "build.rs"
 
+[lib]
+path = "lib.rs"
+
 [dependencies]
 deno = "0.15.0"
 serde_json = "1.0"

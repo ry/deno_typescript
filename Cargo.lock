@@ -37,20 +37,20 @@ version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "deno_ts_example"
-version = "0.0.1"
-dependencies = [
- "deno 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "deno_typescript 0.0.1",
-]
-
-[[package]]
 name = "deno_typescript"
 version = "0.0.1"
 dependencies = [
  "deno 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.98 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "deno_typescript_example"
+version = "0.0.1"
+dependencies = [
+ "deno 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "deno_typescript 0.0.1",
 ]
 
 [[package]]

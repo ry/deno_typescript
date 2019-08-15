@@ -1,9 +1,13 @@
 [package]
-name = "deno_ts_example"
+name = "deno_typescript_example"
 version = "0.0.1"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
 publish = false
+
+[[bin]]
+path = "main.rs"
+name = "deno_typescript_example"
 
 [dependencies]
 deno = "0.15.0"

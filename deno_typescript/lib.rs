@@ -14,9 +14,9 @@ use std::path::PathBuf;
 fn new_isolate() -> Isolate {
   // let mut isolate = Isolate::new(StartupData::Snapshot(TS_SNAPSHOT), false);
   let mut isolate = Isolate::new(StartupData::None, false);
-  let typescript_code = include_str!("typescript.js");
+  let typescript_code = include_str!("assets/typescript.js");
   let main_code = include_str!("main.js");
-  js_check(isolate.execute("typescript.js", typescript_code));
+  js_check(isolate.execute("assets/typescript.js", typescript_code));
   js_check(isolate.execute("main.js", main_code));
 
   isolate.set_dispatch(move |op_id, control_buf, _zero_copy_buf| {
