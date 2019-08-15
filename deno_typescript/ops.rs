@@ -32,7 +32,9 @@ pub fn get_souce_file(control_buf: &[u8]) -> CoreOp {
     });
 
   let js_source_str = if !v.file_name.starts_with("$asset$/") {
-    std::fs::read_to_string(&v.file_name).unwrap()
+    let s = std::fs::read_to_string(&v.file_name).unwrap();
+    println!("cargo:rerun-if-changed={}", &v.file_name);
+    s
   } else {
     let asset = v.file_name.replace("$asset$/", "");
     match asset.as_str() {
