@@ -13,9 +13,9 @@ use deno::ErrBox;
 use deno::Isolate;
 use deno::StartupData;
 // use deno_snapshot::make_snapshot;
-use std::path::PathBuf;
-use std::path::Path;
 use deno::js_check;
+use std::path::Path;
+use std::path::PathBuf;
 
 // make_snapshot!(TS_SNAPSHOT, "src/typescript.js", "src/main.js");
 
@@ -28,11 +28,11 @@ fn new_isolate() -> Isolate {
   js_check(isolate.execute("main.js", main_code));
 
   isolate.set_dispatch(move |op_id, control_buf, _zero_copy_buf| {
-    println!("op_id {}", op_id);
-
+    // println!("op_id {}", op_id);
     match op_id {
       49 => ops::get_souce_file(control_buf),
       50 => ops::exit(control_buf),
+      51 => ops::write_file(control_buf),
       _ => unreachable!(),
     }
   });
@@ -47,16 +47,36 @@ fn compile_typescript(
   Ok(())
 }
 
-pub fn make_ts_snapshot(out_path: &Path, root_names: Vec<PathBuf>) -> Result<(), ErrBox> {
+pub fn make_ts_snapshot(
+  out_path: &Path,
+  root_names: Vec<PathBuf>,
+) -> Result<(), ErrBox> {
   let mut ts_isolate = new_isolate();
 
-  let runtime_isolate = Isolate::new(StartupData::None, true);
-
   for filename in root_names {
+    assert!(filename.exists());
+    println!("cargo:rerun-if-changed={}", filename.display());
     let js_path_str = filename.to_str().unwrap();
     // TODO emit will be called, add these files to the runtime_isolate.
     // TODO lift js_check to caller?
     js_check(compile_typescript(&mut ts_isolate, js_path_str));
+  }
+
+  let out_dir = Path::new("/tmp/foo"); // TODO(ry) duplicated in main.js
+
+  let mut runtime_isolate = Isolate::new(StartupData::None, true);
+
+  for entry in std::fs::read_dir(out_dir)? {
+    let entry = entry?;
+    let path = entry.path();
+    if let Some(ext) = path.extension() {
+      if ext == "js" {
+        println!("output file: {}", path.display());
+        let data = std::fs::read_to_string(&path).unwrap();
+        let path_str = path.to_str().unwrap();
+        js_check(runtime_isolate.execute(path_str, &data));
+      }
+    }
   }
 
   println!("creating snapshot ");

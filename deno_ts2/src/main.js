@@ -30,6 +30,7 @@ function encode(str) {
 const ops = {
   getSourceFile: 49,
   exit: 50,
+  writeFile: 51,
 };
 
 
@@ -105,7 +106,7 @@ class Host {
     sourceFiles = null
   ) {
     println(`writeFile ${fileName}`);
-    unreachable();
+    writeFile(fileName, data);
   }
 
   // getSourceFileByPath?(fileName: string, path: Path, languageVersion: ScriptTarget, onError?: (message: string) => void, shouldCreateNewSourceFile?: boolean): SourceFile | undefined;
@@ -178,7 +179,7 @@ function main(...rootNames) {
     checkJs: false,
     esModuleInterop: true,
     module: ts.ModuleKind.ESNext,
-    outDir: OUT_DIR,
+    outDir: "/tmp/foo/",
     resolveJsonModule: false,
     sourceMap: true,
     stripComments: true,
@@ -212,4 +213,13 @@ function JSONmsg(obj) {
 function exit(code) {
   Deno.core.dispatch(ops.exit, JSONmsg({ code }));
   unreachable();
+}
+
+function writeFile(fileName, data) {
+  let resUi8 = Deno.core.dispatch(ops.writeFile, JSONmsg({ fileName, data }));
+  let resStr = decodeAscii(resUi8);
+  let res = JSON.parse(resStr);
+  if (!res["ok"]) {
+    throw Error(`writeFile failed ${res["err"]}`);
+  }
 }
