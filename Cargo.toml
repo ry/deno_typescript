@@ -1,5 +1,5 @@
 [workspace]
 members = [
-  "deno_ts2",
-  "example2",
+  "deno_ts",
+  "example",
 ]

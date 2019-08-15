@@ -1,13 +1,13 @@
 [package]
-name = "deno_snapshot_example2"
-version = "0.1.0"
+name = "deno_ts_example"
+version = "0.15.0"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
 publish = false
 
 [dependencies]
-deno = "0.14.0"
+deno = "0.15.0"
 
 [build-dependencies]
-deno_ts2 = { path = "../deno_ts2" }
+deno_ts = { path = "../deno_ts" }
 

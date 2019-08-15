@@ -1,12 +1,12 @@
 [package]
-name = "deno_ts2"
+name = "deno_ts"
 publish = false
-version = "0.1.0"
+version = "0.15.0"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
 build = "build.rs"
 
 [dependencies]
-deno = "0.14.0"
+deno = "0.15.0"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }

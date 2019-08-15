@@ -1,4 +1,4 @@
-use deno_ts2::make_ts_snapshot;
+use deno_ts::make_ts_snapshot;
 use std::path::PathBuf;
 
 fn main() {
@@ -16,5 +16,3 @@ fn main() {
     snapshot_path.display()
   );
 }
-
-// make_snapshot!(SNAPSHOT, "src/bundle.js");
