@@ -11,8 +11,8 @@ fn main() {
     PathBuf::from(std::env::var_os("CARGO_MANIFEST_DIR").unwrap());
 
   let roots = vec![cargo_manifest_dir.join("src/bundle.ts")];
-  deno_ts::tsc(&ts_out_dir, roots).unwrap();
-  deno_ts::mksnapshot(&ts_out_dir, &snapshot_path).unwrap();
+  deno_typescript::tsc(&ts_out_dir, roots).unwrap();
+  deno_typescript::mksnapshot(&ts_out_dir, &snapshot_path).unwrap();
   println!(
     "cargo:rustc-env=EXAMPLE2_SNAPSHOT={}",
     snapshot_path.display()

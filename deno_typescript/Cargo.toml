@@ -1,7 +1,8 @@
 [package]
-name = "deno_ts"
+name = "deno_typescript"
 publish = false
 version = "0.0.1"
+repository = "https://github.com/ry/deno_typescript"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
 build = "build.rs"
