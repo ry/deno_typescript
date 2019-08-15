@@ -9,5 +9,5 @@ publish = false
 deno = "0.15.0"
 
 [build-dependencies]
-deno_ts = { path = "../deno_ts" }
+deno_typescript = { path = "../deno_typescript" }
 
