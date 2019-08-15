@@ -174,8 +174,9 @@ class Host {
 }
 
 
-function main(configText, ...rootNames) {
+function main(configText, rootNames) {
   println(`>>> ts version ${ts.version}`);
+  println(`>>> rootNames ${rootNames}`);
   const host = new Host();
 
   assert(rootNames.length > 0);

@@ -33,10 +33,16 @@ fn new_isolate() -> Isolate {
 
 fn compile_typescript(
   isolate: &mut Isolate,
-  filename: &str,
   config_json: &serde_json::Value,
+  root_names: Vec<PathBuf>,
 ) -> Result<(), ErrBox> {
-  let source = &format!("main({:?}, {:?})", config_json.to_string(), filename);
+  for f in &root_names {
+    assert!(f.exists());
+    println!("cargo:rerun-if-changed={}", f.display());
+  }
+  let root_names_json = serde_json::json!(root_names).to_string();
+  let source =
+    &format!("main({:?}, {})", config_json.to_string(), root_names_json);
   isolate.execute("<anon>", source)?;
   Ok(())
 }
@@ -49,27 +55,21 @@ pub fn tsc(ts_out_dir: &Path, root_names: Vec<PathBuf>) -> Result<(), ErrBox> {
     "allowNonTsExtensions": true,
     "checkJs": false,
     "esModuleInterop": true,
-    "module": "esnext",
+    "module": "ESNext",
     "outDir": ts_out_dir,
     "resolveJsonModule": false,
     "sourceMap": true,
     "stripComments": true,
-    // "target": "esnext",
+    "target": "ESNext",
     "lib": ["lib.esnext.d.ts", "deno_core.d.ts"]
   });
 
-  for filename in root_names {
-    assert!(filename.exists());
-    println!("cargo:rerun-if-changed={}", filename.display());
-    let js_path_str = filename.to_str().unwrap();
-    // TODO emit will be called, add these files to the runtime_isolate.
-    // TODO lift js_check to caller?
-    js_check(compile_typescript(
-      &mut ts_isolate,
-      js_path_str,
-      &config_json,
-    ));
-  }
+  // TODO lift js_check to caller?
+  js_check(compile_typescript(
+    &mut ts_isolate,
+    &config_json,
+    root_names,
+  ));
 
   Ok(())
 }

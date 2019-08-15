@@ -18,7 +18,7 @@ pub fn exit(control_buf: &[u8]) -> CoreOp {
 #[serde(rename_all = "camelCase")]
 struct GetSourceFile {
   file_name: String,
-  language_version: Option<i32>,
+  language_version: Option<String>,
   should_create_new_source_file: bool,
 }
 
