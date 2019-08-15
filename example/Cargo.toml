@@ -1,6 +1,6 @@
 [package]
 name = "deno_ts_example"
-version = "0.15.0"
+version = "0.0.1"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
 publish = false
