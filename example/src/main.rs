@@ -1,14 +1,12 @@
 use deno::js_check;
 use deno::Isolate;
 use deno::StartupData;
-use deno_ts::make_ts_snapshot;
-
-// make_snapshot!(SNAPSHOT, "src/bundle.js");
-
-make_ts_snapshot!(TS_SNAPSHOT, "src/bundle.ts");
 
 fn main() {
-  let x = TS_SNAPSHOT;
+  let snapshot_filename = env!("EXAMPLE2_SNAPSHOT");
+  println!("snapshot file {}", snapshot_filename);
+  let x = include_bytes!(env!("EXAMPLE2_SNAPSHOT"));
+
   assert!(x.len() > 10);
 
   let mut isolate = Isolate::new(StartupData::Snapshot(x), false);

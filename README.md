@@ -1,5 +1,9 @@
-# deno_snapshot
+# deno_ts
 
-Exploring how V8 snapshots can be done at compile time using Rust's proc macros.
+[![Build Status](https://travis-ci.com/ry/deno_snapshot.svg?branch=master)](https://travis-ci.com/ry/deno_snapshot)
 
-https://blog.rust-lang.org/2018/12/21/Procedural-Macros-in-Rust-2018.html
+Exploring how V8 snapshots can be done at compile time in build.rs
+
+Exports a standalone Isolate for compiling TypeScript.
+
+See example.

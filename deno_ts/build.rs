@@ -1,4 +1,11 @@
 fn main() {
-  println!("cargo:rerun-if-changed=deno_ts/src/main.js");
-  println!("cargo:rerun-if-changed=deno_ts/src/typescript.js");
+  let cwd = std::env::current_dir().unwrap();
+  println!(
+    "cargo:rerun-if-changed={}",
+    cwd.join("src/main.js").display()
+  );
+  println!(
+    "cargo:rerun-if-changed={}",
+    cwd.join("src/typescript.js").display()
+  );
 }
