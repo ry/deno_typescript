@@ -36,6 +36,7 @@ pub fn get_souce_file(control_buf: &[u8]) -> CoreOp {
   } else {
     let asset = v.file_name.replace("$asset$/", "");
     match asset.as_str() {
+      "deno_core.d.ts" => include_str!("deno_core.d.ts").to_string(),
       "lib.esnext.d.ts" => include_str!("lib.esnext.d.ts").to_string(),
       "lib.es2019.d.ts" => include_str!("lib.es2019.d.ts").to_string(),
       "lib.es2018.d.ts" => include_str!("lib.es2018.d.ts").to_string(),

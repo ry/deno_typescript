@@ -37,7 +37,6 @@ fn compile_typescript(
   config_json: &serde_json::Value,
 ) -> Result<(), ErrBox> {
   let source = &format!("main({:?}, {:?})", config_json.to_string(), filename);
-  println!("source {}", source);
   isolate.execute("<anon>", source)?;
   Ok(())
 }
@@ -56,7 +55,7 @@ pub fn tsc(ts_out_dir: &Path, root_names: Vec<PathBuf>) -> Result<(), ErrBox> {
     "sourceMap": true,
     "stripComments": true,
     // "target": "esnext",
-    "lib": ["lib.esnext.d.ts"]
+    "lib": ["lib.esnext.d.ts", "deno_core.d.ts"]
   });
 
   for filename in root_names {
@@ -98,8 +97,9 @@ pub fn mksnapshot(
   let snapshot = runtime_isolate.snapshot()?;
   let snapshot_slice =
     unsafe { std::slice::from_raw_parts(snapshot.data_ptr, snapshot.data_len) };
-  println!("created snapshot {} bytes", snapshot_slice.len());
+  println!("snapshot bytes {}", snapshot_slice.len());
 
   std::fs::write(snapshot_path, snapshot_slice)?;
+  println!("snapshot path {} ", snapshot_path.display());
   Ok(())
 }
