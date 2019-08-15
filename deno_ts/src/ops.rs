@@ -18,12 +18,18 @@ pub fn exit(control_buf: &[u8]) -> CoreOp {
 #[serde(rename_all = "camelCase")]
 struct GetSourceFile {
   file_name: String,
-  language_version: i32,
+  language_version: Option<i32>,
   should_create_new_source_file: bool,
 }
 
 pub fn get_souce_file(control_buf: &[u8]) -> CoreOp {
-  let v: GetSourceFile = serde_json::from_slice(control_buf).expect("ok");
+  let v: GetSourceFile =
+    serde_json::from_slice(control_buf).unwrap_or_else(|_| {
+      panic!(
+        "bad control slice {}",
+        std::str::from_utf8(control_buf).unwrap()
+      )
+    });
 
   let js_source_str = if !v.file_name.starts_with("$asset$/") {
     std::fs::read_to_string(&v.file_name).unwrap()

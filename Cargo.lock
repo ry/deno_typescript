@@ -38,7 +38,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "deno_ts"
-version = "0.15.0"
+version = "0.0.1"
 dependencies = [
  "deno 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.98 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -47,10 +47,10 @@ dependencies = [
 
 [[package]]
 name = "deno_ts_example"
-version = "0.15.0"
+version = "0.0.1"
 dependencies = [
  "deno 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "deno_ts 0.15.0",
+ "deno_ts 0.0.1",
 ]
 
 [[package]]

@@ -1,23 +1,15 @@
-/*
-#[macro_use]
-extern crate include_dir;
-*/
-
 extern crate deno;
 extern crate serde;
 extern crate serde_json;
 
 mod ops;
 
+use deno::js_check;
 use deno::ErrBox;
 use deno::Isolate;
 use deno::StartupData;
-// use deno_snapshot::make_snapshot;
-use deno::js_check;
 use std::path::Path;
 use std::path::PathBuf;
-
-// make_snapshot!(TS_SNAPSHOT, "src/typescript.js", "src/main.js");
 
 fn new_isolate() -> Isolate {
   // let mut isolate = Isolate::new(StartupData::Snapshot(TS_SNAPSHOT), false);
@@ -42,16 +34,34 @@ fn new_isolate() -> Isolate {
 fn compile_typescript(
   isolate: &mut Isolate,
   filename: &str,
+  config_json: &serde_json::Value,
 ) -> Result<(), ErrBox> {
-  isolate.execute("<anon>", &format!("main({:?})", filename))?;
+  let source = &format!("main({:?}, {:?})", config_json.to_string(), filename);
+  println!("source {}", source);
+  isolate.execute("<anon>", source)?;
   Ok(())
 }
 
 pub fn make_ts_snapshot(
-  out_path: &Path,
+  ts_out_dir: &Path,
+  snapshot_path: &Path,
   root_names: Vec<PathBuf>,
 ) -> Result<(), ErrBox> {
   let mut ts_isolate = new_isolate();
+
+  let config_json = serde_json::json!({
+    "allowJs": true,
+    "allowNonTsExtensions": true,
+    "checkJs": false,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "outDir": ts_out_dir,
+    "resolveJsonModule": false,
+    "sourceMap": true,
+    "stripComments": true,
+    // "target": "esnext",
+    "lib": ["lib.esnext.d.ts"]
+  });
 
   for filename in root_names {
     assert!(filename.exists());
@@ -59,7 +69,11 @@ pub fn make_ts_snapshot(
     let js_path_str = filename.to_str().unwrap();
     // TODO emit will be called, add these files to the runtime_isolate.
     // TODO lift js_check to caller?
-    js_check(compile_typescript(&mut ts_isolate, js_path_str));
+    js_check(compile_typescript(
+      &mut ts_isolate,
+      js_path_str,
+      &config_json,
+    ));
   }
 
   let out_dir = Path::new("/tmp/foo"); // TODO(ry) duplicated in main.js
@@ -85,7 +99,7 @@ pub fn make_ts_snapshot(
     unsafe { std::slice::from_raw_parts(snapshot.data_ptr, snapshot.data_len) };
   println!("created snapshot {} bytes", snapshot_slice.len());
 
-  std::fs::write(out_path, snapshot_slice)?;
+  std::fs::write(snapshot_path, snapshot_slice)?;
   Ok(())
 }
 

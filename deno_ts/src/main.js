@@ -1,6 +1,4 @@
-
 const ASSETS = "$asset$";
-const OUT_DIR = "$deno$";
 
 function println(...s) {
   Deno.core.print(s.join(" ") + "\n");
@@ -9,6 +7,12 @@ function println(...s) {
 
 function unreachable() {
   throw Error("unreachable");
+}
+
+function assert(cond) {
+  if (!cond) {
+  	throw Error("assert");
+	}
 }
 
 // decode(Uint8Array): string
@@ -170,23 +174,23 @@ class Host {
 }
 
 
-function main(...rootNames) {
+function main(configText, ...rootNames) {
   println(`>>> ts version ${ts.version}`);
   const host = new Host();
-  const options = {
-    allowJs: true,
-    allowNonTsExtensions: true,
-    checkJs: false,
-    esModuleInterop: true,
-    module: ts.ModuleKind.ESNext,
-    outDir: "/tmp/foo/",
-    resolveJsonModule: false,
-    sourceMap: true,
-    stripComments: true,
-    target: ts.ScriptTarget.ESNext,
-    lib: ["lib.esnext.d.ts"]
-  };
-  const program = ts.createProgram(rootNames, options, host);
+
+  assert(rootNames.length > 0);
+
+	const { config, error } = ts.parseConfigFileTextToJson(
+		"builtin_tsconfig.json",
+    configText
+  );
+  if (error) {
+    println(`err ${error}`);
+    const msg = ts.formatDiagnosticsWithColorAndContext([error], host);
+    println(msg);
+    exit(1);
+	}
+  const program = ts.createProgram(rootNames, config, host);
   let diagnostics = ts.getPreEmitDiagnostics(program)
   if (diagnostics && diagnostics.length === 0) {
     const emitResult = program.emit();
