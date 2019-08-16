@@ -9,7 +9,7 @@ declare interface MessageCallback {
 }
 
 declare interface DenoCore {
-  print(msg: string): void;
+  print(s: string, is_err?: boolean);
   dispatch(
     opId: number,
     control: Uint8Array,
@@ -25,3 +25,8 @@ declare interface DenoCore {
     shift(): Uint8Array | null;
   };
 }
+
+declare interface DenoInterface {
+  core: DenoCore;
+}
+declare var Deno: DenoInterface;
