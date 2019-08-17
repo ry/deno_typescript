@@ -7,7 +7,6 @@ repository = "https://github.com/ry/deno_typescript"
 readme = "../README.md"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
-build = "build.rs"
 
 [lib]
 path = "lib.rs"

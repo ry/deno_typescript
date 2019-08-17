@@ -1,11 +1,13 @@
+const window = (0, eval)("this");
+
+// const core = window.Deno.core as DenoCore;
+
+import { printHello } from "./print_hello.ts";
+
 function add(x: number, y: number): number {
-  // foo
   return x + y;
 }
+window.add = add;
+window.printHello = printHello;
 
-const window = (0, eval)("this");
-const core = window.Deno.core as DenoCore;
-
-function printHello(): void {
-  core.print("hello\n");
-}
+printHello();
