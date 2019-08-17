@@ -15,7 +15,7 @@ fn dispatch2(
 ) -> Result<Value, ErrBox> {
   let v = serde_json::from_slice(control_buf)?;
   match op_id {
-    49 => get_source_file(s, v),
+    49 => read_file(s, v),
     50 => exit(s, v),
     51 => write_file(s, v),
     52 => resolve_module_names(s, v),
@@ -37,14 +37,14 @@ pub fn dispatch_op(s: &mut TSState, op_id: OpId, control_buf: &[u8]) -> CoreOp {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct GetSourceFile {
+struct ReadFile {
   file_name: String,
   language_version: Option<i32>,
   should_create_new_source_file: bool,
 }
 
-fn get_source_file(_s: &mut TSState, v: Value) -> Result<Value, ErrBox> {
-  let v: GetSourceFile = serde_json::from_value(v)?;
+fn read_file(_s: &mut TSState, v: Value) -> Result<Value, ErrBox> {
+  let v: ReadFile = serde_json::from_value(v)?;
   let (module_name, source_code) = if v.file_name.starts_with("$asset$/") {
     let asset = v.file_name.replace("$asset$/", "");
     let source_code = get_asset(&asset);

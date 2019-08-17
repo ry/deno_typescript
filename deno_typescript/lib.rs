@@ -53,8 +53,9 @@ impl TSIsolate {
     TSIsolate { isolate, state }
   }
 
-  // Consumes the compiler, returns the state.
-  // TODO Result<TSState, ErrBox> not ArcMutex
+  // TODO(ry) Instead of Result<Arc<Mutex<TSState>>, ErrBox>, return something
+  // like Result<TSState, ErrBox>. I think it would be nicer if this function
+  // consumes TSIsolate.
   fn compile(
     mut self,
     config_json: &serde_json::Value,
@@ -68,6 +69,8 @@ impl TSIsolate {
   }
 }
 
+// TODO(ry) Instead of Result<Arc<Mutex<TSState>>, ErrBox>, return something
+// like Result<TSState, ErrBox>
 pub fn compile(input: &Path) -> Result<Arc<Mutex<TSState>>, ErrBox> {
   let ts_isolate = TSIsolate::new();
 
@@ -99,10 +102,17 @@ pub fn compile(input: &Path) -> Result<Arc<Mutex<TSState>>, ErrBox> {
   Ok(state)
 }
 
-pub fn mksnapshot(env_var: &str, state: &TSState) -> Result<(), ErrBox> {
+// TODO(ry) Instead of state: Arc<Mutex<TSState>>, take something like state:
+// &TSState
+pub fn mksnapshot(
+  env_var: &str,
+  state: Arc<Mutex<TSState>>,
+) -> Result<(), ErrBox> {
   let mut runtime_isolate = Isolate::new(StartupData::None, true);
   let mut url2id: HashMap<String, deno_mod> = HashMap::new();
   let mut id2url: HashMap<deno_mod, String> = HashMap::new();
+
+  let state = state.lock().unwrap();
 
   // I think this is the main module...
   let main = state.written_files.last().unwrap().1.clone();

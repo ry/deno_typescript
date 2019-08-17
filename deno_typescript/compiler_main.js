@@ -75,7 +75,7 @@ function encode(str) {
 }
 
 const ops = {
-  getSourceFile: 49,
+  readFile: 49,
   exit: 50,
   writeFile: 51,
   resolveModuleNames: 52,
@@ -136,7 +136,7 @@ class Host {
   // | undefined;
   getSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile) {
     assert(!shouldCreateNewSourceFile); // We haven't yet encountered this.
-    const { sourceCode, moduleName } = dispatch("getSourceFile", {
+    const { sourceCode, moduleName } = dispatch("readFile", {
       fileName,
       languageVersion,
       shouldCreateNewSourceFile
