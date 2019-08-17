@@ -68,8 +68,6 @@ impl TSIsolate {
   }
 }
 
-/// Writes a bundled AMD JS file to out_file.
-/// root_names are the input typescript files to be compiled.
 pub fn compile(input: &Path) -> Result<Arc<Mutex<TSState>>, ErrBox> {
   let ts_isolate = TSIsolate::new();
 
@@ -124,7 +122,6 @@ pub fn mksnapshot(env_var: &str, state: &TSState) -> Result<(), ErrBox> {
     let import_url =
       ModuleSpecifier::resolve_import(specifier, referrer_url.as_str())
         .unwrap();
-    // println!("Lookup {} {} {}", specifier, referrer_url, import_url);
     *url2id_.get(import_url.as_str()).unwrap()
   };
 
@@ -141,7 +138,7 @@ pub fn mksnapshot(env_var: &str, state: &TSState) -> Result<(), ErrBox> {
   let snapshot = runtime_isolate.snapshot()?;
   let snapshot_slice =
     unsafe { std::slice::from_raw_parts(snapshot.data_ptr, snapshot.data_len) };
-  // println!("cargo:warn=snapshot bytes {}", snapshot_slice.len());
+  println!("snapshot bytes {}", snapshot_slice.len());
   //
   let out_dir = PathBuf::from(std::env::var_os("OUT_DIR").unwrap());
   let snapshot_path = out_dir.join(env_var);

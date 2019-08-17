@@ -3,7 +3,7 @@ use deno::Isolate;
 use deno::StartupData;
 
 fn main() {
-  let x = include_bytes!(env!("EXAMPLE2_SNAPSHOT"));
+  let x = include_bytes!(env!("SNAPSHOT"));
   assert!(x.len() > 10);
 
   let mut isolate = Isolate::new(StartupData::Snapshot(x), false);
