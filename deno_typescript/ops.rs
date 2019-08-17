@@ -8,7 +8,7 @@ use serde::Deserialize;
 use serde_json::json;
 use serde_json::Value;
 
-pub fn dispatch_op_inner(
+fn dispatch2(
   s: &mut TSState,
   op_id: OpId,
   control_buf: &[u8],
@@ -25,7 +25,7 @@ pub fn dispatch_op_inner(
 }
 
 pub fn dispatch_op(s: &mut TSState, op_id: OpId, control_buf: &[u8]) -> CoreOp {
-  let result = dispatch_op_inner(s, op_id, control_buf);
+  let result = dispatch2(s, op_id, control_buf);
   let response = match result {
     Ok(v) => json!({ "ok": v }),
     Err(err) => json!({ "err": err.to_string() }),

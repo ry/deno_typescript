@@ -18,7 +18,6 @@ use std::sync::Mutex;
 
 #[derive(Debug)]
 pub struct TSState {
-  main: Option<ModuleSpecifier>,
   exit_code: i32,
   emit_result: Option<EmitResult>,
   // (url, corresponding_module, source_code)
@@ -40,7 +39,6 @@ impl TSIsolate {
     js_check(isolate.execute("compiler_main.js", main_code));
 
     let state = Arc::new(Mutex::new(TSState {
-      main: None,
       exit_code: 0,
       emit_result: None,
       written_files: Vec::new(),

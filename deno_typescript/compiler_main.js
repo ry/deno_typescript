@@ -212,7 +212,6 @@ class Host {
     const r = resolvedNames.map(resolvedFileName => {
       return { resolvedFileName };
     });
-    println(`XXXX resolveModuleNames ${JSON.stringify(r)}`);
     return r;
   }
 
