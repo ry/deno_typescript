@@ -10,6 +10,7 @@ use deno::Isolate;
 use deno::ModuleSpecifier;
 use deno::StartupData;
 pub use ops::EmitResult;
+use ops::WrittenFile;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
@@ -22,7 +23,7 @@ pub struct TSState {
   exit_code: i32,
   emit_result: Option<EmitResult>,
   // (url, corresponding_module, source_code)
-  written_files: Vec<(String, String, String)>,
+  written_files: Vec<WrittenFile>,
 }
 
 pub struct TSIsolate {
@@ -114,15 +115,15 @@ pub fn mksnapshot(
 
   let state = state.lock().unwrap();
 
-  // I think this is the main module...
-  let main = state.written_files.last().unwrap().1.clone();
+  let main = state.written_files.last().unwrap().module_name.clone();
 
-  for (url, module_name, source_code) in state.written_files.iter() {
-    if url.as_str().ends_with(".js") {
+  for f in state.written_files.iter() {
+    if f.url.ends_with(".js") {
+      let is_main = f.module_name == main;
       let id =
-        js_check(runtime_isolate.mod_new(false, url.as_str(), source_code));
-      url2id.insert(module_name.as_str().to_string(), id);
-      id2url.insert(id, module_name.as_str().to_string());
+        js_check(runtime_isolate.mod_new(is_main, &f.url, &f.source_code));
+      url2id.insert(f.module_name.clone(), id);
+      id2url.insert(id, f.module_name.clone());
     }
   }
 

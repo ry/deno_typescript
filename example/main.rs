@@ -3,10 +3,8 @@ use deno::Isolate;
 use deno::StartupData;
 
 fn main() {
-  let x = include_bytes!(env!("SNAPSHOT"));
-  assert!(x.len() > 10);
-
-  let mut isolate = Isolate::new(StartupData::Snapshot(x), false);
+  let snapshot = StartupData::Snapshot(include_bytes!(env!("SNAPSHOT")));
+  let mut isolate = Isolate::new(snapshot, false);
   js_check(isolate.execute(
     "<anon>",
     r#"

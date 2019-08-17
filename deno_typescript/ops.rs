@@ -8,6 +8,13 @@ use serde::Deserialize;
 use serde_json::json;
 use serde_json::Value;
 
+#[derive(Debug)]
+pub struct WrittenFile {
+  pub url: String,
+  pub module_name: String,
+  pub source_code: String,
+}
+
 fn dispatch2(
   s: &mut TSState,
   op_id: OpId,
@@ -77,11 +84,11 @@ fn write_file(s: &mut TSState, v: Value) -> Result<Value, ErrBox> {
   let v: WriteFile = serde_json::from_value(v)?;
   let module_specifier = ModuleSpecifier::resolve_url_or_path(&v.file_name)?;
   // let path = module_specifier.as_url().to_file_path().unwrap();
-  s.written_files.push((
-    module_specifier.as_str().to_string(),
-    v.module_name,
-    v.data,
-  ));
+  s.written_files.push(WrittenFile {
+    url: module_specifier.as_str().to_string(),
+    module_name: v.module_name,
+    source_code: v.data,
+  });
   Ok(json!(true))
 }
 
