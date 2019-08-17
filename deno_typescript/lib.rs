@@ -13,6 +13,7 @@ pub use ops::EmitResult;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -69,10 +70,7 @@ impl TSIsolate {
 
 /// Writes a bundled AMD JS file to out_file.
 /// root_names are the input typescript files to be compiled.
-pub fn compile(
-  out_dir: &Path,
-  input: &Path,
-) -> Result<Arc<Mutex<TSState>>, ErrBox> {
+pub fn compile(input: &Path) -> Result<Arc<Mutex<TSState>>, ErrBox> {
   let ts_isolate = TSIsolate::new();
 
   let config_json = serde_json::json!({
@@ -80,7 +78,6 @@ pub fn compile(
       "declaration": true,
       "lib": ["esnext"],
       "module": "esnext",
-      "outDir": out_dir,
       "target": "esnext",
       "listFiles": true,
       "listEmittedFiles": true,
@@ -104,11 +101,7 @@ pub fn compile(
   Ok(state)
 }
 
-pub fn mksnapshot(
-  env_var: &str,
-  state: &TSState,
-  snapshot_path: &Path,
-) -> Result<(), ErrBox> {
+pub fn mksnapshot(env_var: &str, state: &TSState) -> Result<(), ErrBox> {
   let mut runtime_isolate = Isolate::new(StartupData::None, true);
   let mut url2id: HashMap<String, deno_mod> = HashMap::new();
   let mut id2url: HashMap<deno_mod, String> = HashMap::new();
@@ -149,8 +142,11 @@ pub fn mksnapshot(
   let snapshot_slice =
     unsafe { std::slice::from_raw_parts(snapshot.data_ptr, snapshot.data_len) };
   // println!("cargo:warn=snapshot bytes {}", snapshot_slice.len());
+  //
+  let out_dir = PathBuf::from(std::env::var_os("OUT_DIR").unwrap());
+  let snapshot_path = out_dir.join(env_var);
 
-  fs::write(snapshot_path, snapshot_slice)?;
+  fs::write(&snapshot_path, snapshot_slice)?;
   println!("snapshot path {} ", snapshot_path.display());
   println!("cargo:rustc-env={}={}", env_var, snapshot_path.display());
   Ok(())
