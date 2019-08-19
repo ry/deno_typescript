@@ -1,6 +1,6 @@
 [workspace]
 members = [
   "deno_typescript",
-  "deno_cli_snapshots",
+  "cli_snapshots",
   "example",
 ]

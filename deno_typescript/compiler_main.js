@@ -86,7 +86,9 @@ const ops = {
 class Host {
   // fileExists(fileName: string): boolean;
   fileExists(fileName) {
-    unreachable();
+    println(`fileExists ${fileName}`);
+    return true;
+    // unreachable();
   }
 
   // readFile(fileName: string): string | undefined;
@@ -162,8 +164,14 @@ class Host {
     onError = null,
     sourceFiles = null
   ) {
-    assert(sourceFiles.length == 1);
-    let { moduleName } = sourceFiles[0];
+    let moduleName;
+    if (sourceFiles.length == 1) {
+      moduleName = sourceFiles[0].moduleName;
+    } else {
+      // In this case we are a bundle.
+      moduleName = sourceFiles[sourceFiles.length - 1].moduleName;
+      println(`writeFile ${fileName} ${moduleName}`);
+    }
     return dispatch("writeFile", { fileName, moduleName, data });
   }
 
@@ -263,7 +271,7 @@ function dispatch(opName, obj) {
   const resStr = decodeAscii(resUi8);
   const res = JSON.parse(resStr);
   if (!res["ok"]) {
-    throw Error(`${opName} failed ${res["err"]}`);
+    throw Error(`${opName} failed ${res["err"]}. Args: ${JSON.stringify(obj)}`);
   }
   return res["ok"];
 }
@@ -273,10 +281,21 @@ function exit(code) {
   unreachable();
 }
 
+// Maximum number of diagnostics to display.
+const MAX_ERRORS = 5;
+
 function handleDiagnostics(host, diagnostics) {
   if (diagnostics && diagnostics.length) {
+    let rest = 0;
+    if (diagnostics.length > MAX_ERRORS) {
+      rest = diagnostics.length - MAX_ERRORS;
+      diagnostics = diagnostics.slice(0, MAX_ERRORS);
+    }
     const msg = ts.formatDiagnosticsWithColorAndContext(diagnostics, host);
     println(msg);
+    if (rest) {
+      println(`And ${rest} other errors.`);
+    }
     exit(1);
   }
 }
