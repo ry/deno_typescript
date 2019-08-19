@@ -37,6 +37,14 @@ version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "deno_cli_snapshots"
+version = "0.0.1"
+dependencies = [
+ "deno 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "deno_typescript 0.0.2",
+]
+
+[[package]]
 name = "deno_typescript"
 version = "0.0.2"
 dependencies = [
