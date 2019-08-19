@@ -1,0 +1,1 @@
+{"version":3,"file":"glob.js","sourceRoot":"","sources":["https://raw.githubusercontent.com/denoland/deno_std/v0.5.0/fs/glob.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,cAAc,CAAC;AAkBvC;;;;;;;;;;;;;;;;;;;;;;;GAuBG;AACH,MAAM,UAAU,IAAI,CAAC,IAAY,EAAE,UAAuB,EAAE;IAC1D,OAAO,OAAO,CAAC,IAAI,EAAE,OAAO,CAAC,CAAC,KAAK,CAAC;AACtC,CAAC"}
