@@ -208,17 +208,12 @@ pub fn mksnapshot_bundle_ts(
   let source_code = std::str::from_utf8(&source_code_vec)?;
 
   js_check(runtime_isolate.execute("almond_.js", include_str!("almond.js")));
-
-  js_check(runtime_isolate.execute("bundle", &source_code));
-
-  // execute main.
+  js_check(runtime_isolate.execute(&bundle.to_string_lossy(), &source_code));
 
   let state = state.lock().unwrap();
   let main = state.written_files.last().unwrap().module_name.clone();
 
   js_check(runtime_isolate.execute("typescript.js", TYPESCRIPT_CODE));
-
-  // let main = "file:///Users/rld/src/deno_typescript/cli_snapshots/js/main.ts";
   js_check(runtime_isolate.execute("anon", &format!("require('{}')", main)));
 
   snapshot_to_env(runtime_isolate, env_var)?;
@@ -232,7 +227,7 @@ pub fn mksnapshot(
   env_var: &str,
   state: Arc<Mutex<TSState>>,
 ) -> Result<(), ErrBox> {
-  assert!(state.lock().unwrap().bundle);
+  assert!(!state.lock().unwrap().bundle);
 
   let mut runtime_isolate = Isolate::new(StartupData::None, true);
   let mut url2id: HashMap<String, deno_mod> = HashMap::new();
