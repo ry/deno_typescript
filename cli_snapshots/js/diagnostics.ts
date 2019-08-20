@@ -5,7 +5,7 @@
 // diagnostics.
 
 // TODO(ry) This is relative to crate root. Should be relative to file.
-/// <reference types="../deno_typescript/assets/typescript.d.ts"/>
+/// <reference types="js/typescript.d.ts"/>
 
 /** The log category for a diagnostic message */
 export enum DiagnosticCategory {
