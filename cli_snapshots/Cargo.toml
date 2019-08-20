@@ -1,6 +1,6 @@
 [package]
 name = "deno_cli_snapshots"
-version = "0.0.1"
+version = "0.0.3"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
 
