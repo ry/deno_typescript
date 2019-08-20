@@ -1,6 +1,7 @@
 [package]
 name = "deno_cli_snapshots"
 version = "0.0.3"
+license = "MIT"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
 description = "Provides snapshots for the deno CLI"
