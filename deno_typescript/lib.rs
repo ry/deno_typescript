@@ -232,7 +232,7 @@ pub fn mksnapshot(
   env_var: &str,
   state: Arc<Mutex<TSState>>,
 ) -> Result<(), ErrBox> {
-  assert!(state.lock().unwrap().bundle == false);
+  assert!(state.lock().unwrap().bundle);
 
   let mut runtime_isolate = Isolate::new(StartupData::None, true);
   let mut url2id: HashMap<String, deno_mod> = HashMap::new();

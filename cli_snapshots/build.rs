@@ -13,10 +13,7 @@ fn main() {
   assert!(bundle.exists());
   deno_typescript::mksnapshot_bundle(&bundle, "CLI_SNAPSHOT", state).unwrap();
 
-  let root_names = vec![
-    // c.join("../deno_typescript/assets/typescript.d.ts"),
-    c.join("js/compiler.ts"),
-  ];
+  let root_names = vec![c.join("js/compiler.ts")];
   let bundle = o.join("COMPILER_SNAPSHOT.js");
   let state = deno_typescript::compile_bundle(&bundle, root_names).unwrap();
   assert!(bundle.exists());
