@@ -4,7 +4,8 @@
 // compiler, which is strongly influenced by the format of TypeScript
 // diagnostics.
 
-import * as ts from "typescript";
+// TODO(ry) This is relative to crate root. Should be relative to file.
+/// <reference types="js/typescript.d.ts"/>
 
 /** The log category for a diagnostic message */
 export enum DiagnosticCategory {

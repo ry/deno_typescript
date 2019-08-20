@@ -42,12 +42,13 @@ pub struct TSIsolate {
   state: Arc<Mutex<TSState>>,
 }
 
+static TYPESCRIPT_CODE: &str = include_str!("assets/typescript.js");
+
 impl TSIsolate {
   fn new(bundle: bool) -> TSIsolate {
     let mut isolate = Isolate::new(StartupData::None, false);
-    let typescript_code = include_str!("assets/typescript.js");
     let main_code = include_str!("compiler_main.js");
-    js_check(isolate.execute("assets/typescript.js", typescript_code));
+    js_check(isolate.execute("assets/typescript.js", TYPESCRIPT_CODE));
     js_check(isolate.execute("compiler_main.js", main_code));
 
     let state = Arc::new(Mutex::new(TSState {
@@ -134,6 +135,8 @@ pub fn compile_bundle(
       "target": "esnext",
       "listFiles": true,
       "listEmittedFiles": true,
+      // "types" : ["typescript.d.ts"],
+      "typeRoots" : ["$typeRoots$"],
       // Emit the source alongside the sourcemaps within a single file;
       // requires --inlineSourceMap or --sourceMap to be set.
       // "inlineSources": true,
@@ -146,7 +149,11 @@ pub fn compile_bundle(
     .iter()
     .map(|p| {
       assert!(p.exists());
-      p.to_string_lossy().to_string()
+
+      let module_specifier =
+        ModuleSpecifier::resolve_url_or_path(&p.to_string_lossy()).unwrap();
+      module_specifier.as_str().to_string()
+      // p.to_string_lossy().to_string()
     })
     .collect();
   root_names_str.push("$asset$/lib.deno_core.d.ts".to_string());
@@ -191,13 +198,36 @@ pub fn mksnapshot_bundle(
   Ok(())
 }
 
+pub fn mksnapshot_bundle_ts(
+  bundle: &Path,
+  env_var: &str,
+  state: Arc<Mutex<TSState>>,
+) -> Result<(), ErrBox> {
+  let mut runtime_isolate = Isolate::new(StartupData::None, true);
+  let source_code_vec = std::fs::read(bundle)?;
+  let source_code = std::str::from_utf8(&source_code_vec)?;
+
+  js_check(runtime_isolate.execute("almond_.js", include_str!("almond.js")));
+  js_check(runtime_isolate.execute(&bundle.to_string_lossy(), &source_code));
+
+  let state = state.lock().unwrap();
+  let main = state.written_files.last().unwrap().module_name.clone();
+
+  js_check(runtime_isolate.execute("typescript.js", TYPESCRIPT_CODE));
+  js_check(runtime_isolate.execute("anon", &format!("require('{}')", main)));
+
+  snapshot_to_env(runtime_isolate, env_var)?;
+
+  Ok(())
+}
+
 // TODO(ry) Instead of state: Arc<Mutex<TSState>>, take something like state:
 // &TSState
 pub fn mksnapshot(
   env_var: &str,
   state: Arc<Mutex<TSState>>,
 ) -> Result<(), ErrBox> {
-  assert!(state.lock().unwrap().bundle == false);
+  assert!(!state.lock().unwrap().bundle);
 
   let mut runtime_isolate = Isolate::new(StartupData::None, true);
   let mut url2id: HashMap<String, deno_mod> = HashMap::new();
@@ -263,4 +293,95 @@ fn snapshot_to_env(
   println!("snapshot path {} ", snapshot_path.display());
   println!("cargo:rustc-env={}={}", env_var, snapshot_path.display());
   Ok(())
+}
+
+pub fn get_asset(asset: &str) -> String {
+  match asset {
+    "lib.deno_core.d.ts" => {
+      include_str!("assets/lib.deno_core.d.ts").to_string()
+    }
+    "lib.esnext.d.ts" => include_str!("assets/lib.esnext.d.ts").to_string(),
+    "lib.es2019.d.ts" => include_str!("assets/lib.es2019.d.ts").to_string(),
+    "lib.es2018.d.ts" => include_str!("assets/lib.es2018.d.ts").to_string(),
+    "lib.es2017.d.ts" => include_str!("assets/lib.es2017.d.ts").to_string(),
+    "lib.es2016.d.ts" => include_str!("assets/lib.es2016.d.ts").to_string(),
+    "lib.es5.d.ts" => include_str!("assets/lib.es5.d.ts").to_string(),
+    "lib.es2015.d.ts" => include_str!("assets/lib.es2015.d.ts").to_string(),
+    "lib.es2015.core.d.ts" => {
+      include_str!("assets/lib.es2015.core.d.ts").to_string()
+    }
+    "lib.es2015.collection.d.ts" => {
+      include_str!("assets/lib.es2015.collection.d.ts").to_string()
+    }
+    "lib.es2015.generator.d.ts" => {
+      include_str!("assets/lib.es2015.generator.d.ts").to_string()
+    }
+    "lib.es2015.iterable.d.ts" => {
+      include_str!("assets/lib.es2015.iterable.d.ts").to_string()
+    }
+    "lib.es2015.promise.d.ts" => {
+      include_str!("assets/lib.es2015.promise.d.ts").to_string()
+    }
+    "lib.es2015.symbol.d.ts" => {
+      include_str!("assets/lib.es2015.symbol.d.ts").to_string()
+    }
+    "lib.es2015.proxy.d.ts" => {
+      include_str!("assets/lib.es2015.proxy.d.ts").to_string()
+    }
+    "lib.es2015.symbol.wellknown.d.ts" => {
+      include_str!("assets/lib.es2015.symbol.wellknown.d.ts").to_string()
+    }
+    "lib.es2015.reflect.d.ts" => {
+      include_str!("assets/lib.es2015.reflect.d.ts").to_string()
+    }
+    "lib.es2016.array.include.d.ts" => {
+      include_str!("assets/lib.es2016.array.include.d.ts").to_string()
+    }
+    "lib.es2017.object.d.ts" => {
+      include_str!("assets/lib.es2017.object.d.ts").to_string()
+    }
+    "lib.es2017.sharedmemory.d.ts" => {
+      include_str!("assets/lib.es2017.sharedmemory.d.ts").to_string()
+    }
+    "lib.es2017.string.d.ts" => {
+      include_str!("assets/lib.es2017.string.d.ts").to_string()
+    }
+    "lib.es2017.intl.d.ts" => {
+      include_str!("assets/lib.es2017.intl.d.ts").to_string()
+    }
+    "lib.es2017.typedarrays.d.ts" => {
+      include_str!("assets/lib.es2017.typedarrays.d.ts").to_string()
+    }
+    "lib.es2018.asynciterable.d.ts" => {
+      include_str!("assets/lib.es2018.asynciterable.d.ts").to_string()
+    }
+    "lib.es2018.promise.d.ts" => {
+      include_str!("assets/lib.es2018.promise.d.ts").to_string()
+    }
+    "lib.es2018.regexp.d.ts" => {
+      include_str!("assets/lib.es2018.regexp.d.ts").to_string()
+    }
+    "lib.es2018.intl.d.ts" => {
+      include_str!("assets/lib.es2018.intl.d.ts").to_string()
+    }
+    "lib.es2019.array.d.ts" => {
+      include_str!("assets/lib.es2019.array.d.ts").to_string()
+    }
+    "lib.es2019.object.d.ts" => {
+      include_str!("assets/lib.es2019.object.d.ts").to_string()
+    }
+    "lib.es2019.string.d.ts" => {
+      include_str!("assets/lib.es2019.string.d.ts").to_string()
+    }
+    "lib.es2019.symbol.d.ts" => {
+      include_str!("assets/lib.es2019.symbol.d.ts").to_string()
+    }
+    "lib.esnext.bigint.d.ts" => {
+      include_str!("assets/lib.esnext.bigint.d.ts").to_string()
+    }
+    "lib.esnext.intl.d.ts" => {
+      include_str!("assets/lib.esnext.intl.d.ts").to_string()
+    }
+    _ => panic!("Unknown asset {}", asset),
+  }
 }

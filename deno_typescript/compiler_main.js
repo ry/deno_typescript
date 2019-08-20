@@ -138,6 +138,17 @@ class Host {
   // | undefined;
   getSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile) {
     assert(!shouldCreateNewSourceFile); // We haven't yet encountered this.
+
+    // This hacks around the fact that TypeScript tries to magically guess the
+    // d.ts filename.
+    if (fileName.startsWith("$typeRoots$")) {
+      assert(fileName.startsWith("$typeRoots$/"));
+      assert(fileName.endsWith("/index.d.ts"));
+      fileName = fileName
+        .replace("$typeRoots$/", "")
+        .replace("/index.d.ts", "");
+    }
+
     const { sourceCode, moduleName } = dispatch("readFile", {
       fileName,
       languageVersion,
@@ -164,14 +175,7 @@ class Host {
     onError = null,
     sourceFiles = null
   ) {
-    let moduleName;
-    if (sourceFiles.length == 1) {
-      moduleName = sourceFiles[0].moduleName;
-    } else {
-      // In this case we are a bundle.
-      moduleName = sourceFiles[sourceFiles.length - 1].moduleName;
-      println(`writeFile ${fileName} ${moduleName}`);
-    }
+    const moduleName = sourceFiles[sourceFiles.length - 1].moduleName;
     return dispatch("writeFile", { fileName, moduleName, data });
   }
 
@@ -218,7 +222,8 @@ class Host {
       containingFile
     });
     const r = resolvedNames.map(resolvedFileName => {
-      return { resolvedFileName };
+      const extension = getExtension(resolvedFileName);
+      return { resolvedFileName, extension };
     });
     return r;
   }
@@ -297,5 +302,20 @@ function handleDiagnostics(host, diagnostics) {
       println(`And ${rest} other errors.`);
     }
     exit(1);
+  }
+}
+
+/** Returns the TypeScript Extension enum for a given media type. */
+function getExtension(fileName) {
+  println("getExtension " + fileName);
+  if (fileName.endsWith(".d.ts")) {
+    return ts.Extension.Dts;
+  } else if (fileName.endsWith(".ts")) {
+    return ts.Extension.Ts;
+  } else if (fileName.endsWith(".js")) {
+    return ts.Extension.Js;
+  } else {
+    // return  msg.MediaType.Unknown:
+    throw TypeError("Cannot resolve extension.");
   }
 }
