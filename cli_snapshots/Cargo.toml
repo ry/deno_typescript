@@ -3,6 +3,9 @@ name = "deno_cli_snapshots"
 version = "0.0.3"
 authors = ["Ryan Dahl <ry@tinyclouds.org>"]
 edition = "2018"
+description = "Provides snapshots for the deno CLI"
+repository = "https://github.com/ry/deno_typescript"
+readme = "../README.md"
 
 [lib]
 path = "lib.rs"
@@ -11,5 +14,5 @@ path = "lib.rs"
 deno = "0.15.0"
 
 [build-dependencies]
-deno_typescript = { path = "../deno_typescript" }
+deno_typescript = { path = "../deno_typescript", version = "0.0.3" }
 
