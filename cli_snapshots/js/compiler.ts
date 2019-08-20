@@ -1,28 +1,34 @@
 // Copyright 2018-2019 the Deno authors. All rights reserved. MIT license.
-import * as msg from "gen/cli/msg_generated";
-import * as ts from "typescript";
+import * as msg from "./msg_generated.ts";
 
-import { assetSourceCode } from "./assets";
-import { bold, cyan, yellow } from "./colors";
-import { Console } from "./console";
-import { core } from "./core";
-import { Diagnostic, fromTypeScriptDiagnostic } from "./diagnostics";
-import { cwd } from "./dir";
-import { sendSync } from "./dispatch";
-import * as flatbuffers from "./flatbuffers";
-import * as os from "./os";
-import { TextDecoder, TextEncoder } from "./text_encoding";
-import { assert, notImplemented } from "./util";
-import * as util from "./util";
-import { window } from "./window";
-import { postMessage, workerClose, workerMain } from "./workers";
-import { writeFileSync } from "./write_file";
+// TODO(ry) This is relative to crate root. Should be relative to file.
+/// <reference types="../deno_typescript/assets/typescript.d.ts"/>
 
+import "./globals.ts";
+
+// import { assetSourceCode } from "./assets.ts";
+import { bold, cyan, yellow } from "./colors.ts";
+import { Console } from "./console.ts";
+import { core } from "./core.ts";
+import { Diagnostic, fromTypeScriptDiagnostic } from "./diagnostics.ts";
+import { cwd } from "./dir.ts";
+import { sendSync } from "./dispatch.ts";
+import * as flatbuffers from "./flatbuffers.ts";
+import * as os from "./os.ts";
+import { TextDecoder, TextEncoder } from "./text_encoding.ts";
+import { assert, notImplemented } from "./util.ts";
+
+import { window } from "./window.ts";
 // Startup boilerplate. This is necessary because the compiler has its own
 // snapshot. (It would be great if we could remove these things or centralize
 // them somewhere else.)
 const console = new Console(core.print);
 window.console = console;
+
+import * as util from "./util.ts";
+import { postMessage, workerClose, workerMain } from "./workers.ts";
+import { writeFileSync } from "./write_file.ts";
+
 window.workerMain = workerMain;
 export default function denoMain(): void {
   os.start(true, "TS");
@@ -241,8 +247,8 @@ class Host implements ts.CompilerHost {
       const assetName = moduleName.includes(".")
         ? moduleName
         : `${moduleName}.d.ts`;
-      assert(assetName in assetSourceCode, `No such asset "${assetName}"`);
-      const sourceCode = assetSourceCode[assetName];
+      const sourceCode = getAsset[assetName];
+      assert(sourceCode, `No such asset "${assetName}"`);
       return {
         moduleName,
         filename: specifier,
@@ -524,3 +530,7 @@ window.compilerMain = function compilerMain(): void {
     workerClose();
   };
 };
+
+function getAsset(name) {
+  throw Error("unimplemented");
+}

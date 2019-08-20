@@ -6,6 +6,12 @@ pub fn isolate() -> Isolate {
   Isolate::new(snapshot, false)
 }
 
+pub fn compiler_isolate() -> Isolate {
+  let snapshot =
+    StartupData::Snapshot(include_bytes!(env!("COMPILER_SNAPSHOT")));
+  Isolate::new(snapshot, false)
+}
+
 #[test]
 fn cli_snapshot() {
   let mut isolate = isolate();
@@ -16,6 +22,20 @@ fn cli_snapshot() {
         throw Error("bad");
       }
       console.log("we have console.log!!!");
+    "#,
+  ));
+}
+
+#[test]
+fn compiler_snapshot() {
+  let mut isolate = compiler_isolate();
+  deno::js_check(isolate.execute(
+    "<anon>",
+    r#"
+      if (!compilerMain) {
+        throw Error("bad");
+      }
+      console.log(`ts version: ${ts.version}`);
     "#,
   ));
 }
