@@ -307,7 +307,6 @@ function handleDiagnostics(host, diagnostics) {
 
 /** Returns the TypeScript Extension enum for a given media type. */
 function getExtension(fileName) {
-  println("getExtension " + fileName);
   if (fileName.endsWith(".d.ts")) {
     return ts.Extension.Dts;
   } else if (fileName.endsWith(".ts")) {
