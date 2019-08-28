@@ -182,7 +182,7 @@ pub fn mksnapshot_bundle(
   let source_code_vec = std::fs::read(bundle)?;
   let source_code = std::str::from_utf8(&source_code_vec)?;
 
-  js_check(runtime_isolate.execute("almond_.js", include_str!("almond.js")));
+  js_check(runtime_isolate.execute("amd_runtime.js", include_str!("amd_runtime.js")));
 
   js_check(runtime_isolate.execute("bundle", &source_code));
 
@@ -207,7 +207,7 @@ pub fn mksnapshot_bundle_ts(
   let source_code_vec = std::fs::read(bundle)?;
   let source_code = std::str::from_utf8(&source_code_vec)?;
 
-  js_check(runtime_isolate.execute("almond_.js", include_str!("almond.js")));
+  js_check(runtime_isolate.execute("amd_runtime.js", include_str!("amd_runtime.js")));
   js_check(runtime_isolate.execute(&bundle.to_string_lossy(), &source_code));
 
   let state = state.lock().unwrap();
