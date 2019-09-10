@@ -1,11 +1,5 @@
-# deno_typescript
 
-[![Build Status](https://travis-ci.com/ry/deno_typescript.svg?branch=master)](https://travis-ci.com/ry/deno_typescript)
+This code was moved into the main repo on 2019-09-02
+https://github.com/denoland/deno/tree/master/deno_typescript
 
-Exploring how V8 snapshots can be done at compile time in build.rs
-
-Exports a standalone Isolate for compiling TypeScript.
-
-Does not support importing from HTTP URLs.
-
-See example.
+https://github.com/denoland/deno/commit/d43b43ca781b025b9a6a54827ea3ef193972ef24
